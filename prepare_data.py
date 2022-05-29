@@ -106,14 +106,15 @@ def check_data_mask(data_save_folder):
 
 
 if __name__ == '__main__':
-    data_root = r'../input'
-    df = parse_all_data(os.path.join(data_root, 'uw-madison-gi-tract-image-segmentation'))
+    input_data_root = r'/kaggle/input'
+    output_data_root = r'/kaggle/working'
+    df = parse_all_data(os.path.join(input_data_root, 'uw-madison-gi-tract-image-segmentation'))
     # delete some case
     fault1 = 'case7_day0'
     fault2 = 'case81_day30'
     df = df[~df['id'].str.contains(fault1) & ~df['id'].str.contains(fault2)].reset_index(drop=True)
 
-    # resave_25d_data(df, os.path.join(data_root, 'mmseg_train'))
-    # split_train_val(os.path.join(data_root, 'mmseg_train'))
-    check_data_mask(os.path.join(data_root, 'mmseg_train'))
+    resave_25d_data(df, os.path.join(output_data_root, 'mmseg_train'))
+    split_train_val(os.path.join(output_data_root, 'mmseg_train'))
+    check_data_mask(os.path.join(output_data_root, 'mmseg_train'))
 

@@ -20,13 +20,13 @@ from utils import set_random_seed, BuildDataset, dice_coef, iou_coef
 
 
 set_random_seed(2022)
-data_root = r'../input'
+output_data_root = r'/kaggle/working'
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
 class CFG(object):
     backbone = 'efficientnet-b0'
-    train_bs = 32
+    train_bs = 64
     valid_bs = train_bs*2
     img_size = [256, 256]
     epochs = 10
@@ -210,11 +210,11 @@ if __name__ == '__main__':
 
     for fold_idx in CFG.folds:
         print(f'### Fold: {fold_idx}')
-        train_dataset = BuildDataset(data_folder=os.path.join(data_root, 'mmseg_train'),
-                                     list_file=os.path.join(data_root, 'mmseg_train', 'splits', f'fold_{fold_idx}.txt'),
+        train_dataset = BuildDataset(data_folder=os.path.join(output_data_root, 'mmseg_train'),
+                                     list_file=os.path.join(output_data_root, 'mmseg_train', 'splits', f'fold_{fold_idx}.txt'),
                                      transforms=data_transforms['train'])
-        val_dataset = BuildDataset(data_folder=os.path.join(data_root, 'mmseg_train'),
-                                   list_file=os.path.join(data_root, 'mmseg_train', 'splits', f'holdout_{fold_idx}.txt'),
+        val_dataset = BuildDataset(data_folder=os.path.join(output_data_root, 'mmseg_train'),
+                                   list_file=os.path.join(output_data_root, 'mmseg_train', 'splits', f'holdout_{fold_idx}.txt'),
                                    transforms=data_transforms['val'])
 
         train_loader = DataLoader(train_dataset, batch_size=CFG.train_bs,
