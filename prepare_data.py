@@ -77,10 +77,10 @@ def split_train_val(data_save_folder):
     split = list(GroupKFold(5).split(patients, groups=patients))
 
     for fold, (train_idx, valid_idx) in enumerate(split):
-        with open(os.path.join(data_save_folder, 'labels', f"fold_{fold}.txt"), "w") as f:
+        with open(os.path.join(data_save_folder, 'splits', f"fold_{fold}.txt"), "w") as f:
             for idx in train_idx:
                 f.write(os.path.basename(all_image_files[idx])[:-4] + "\n")
-        with open(os.path.join(data_save_folder, 'labels', f"holdout_{fold}.txt"), "w") as f:
+        with open(os.path.join(data_save_folder, 'splits', f"holdout_{fold}.txt"), "w") as f:
             for idx in valid_idx:
                 f.write(os.path.basename(all_image_files[idx])[:-4] + "\n")
 
@@ -93,7 +93,8 @@ def check_data_mask(data_save_folder):
     select_label_case = [str(file_path).replace('images', 'labels') for file_path in select_img_case]
 
     for img_path, label_path in tqdm(zip(select_img_case, select_label_case)):
-        img = cv2.imread(img_path, cv2.IMREAD_ANYDEPTH)
+        img = cv2.imread(img_path, cv2.IMREAD_UNCHANGED).astype('float32')
+        img /= img.max(axis=(0, 1))
         label = cv2.imread(label_path)
         if label.max() == 0:
             continue
@@ -105,14 +106,14 @@ def check_data_mask(data_save_folder):
 
 
 if __name__ == '__main__':
-    data_root = r'../input/uw-madison-gi-tract-image-segmentation'
+    data_root = r'../input'
     df = parse_all_data(os.path.join(data_root, 'uw-madison-gi-tract-image-segmentation'))
     # delete some case
     fault1 = 'case7_day0'
     fault2 = 'case81_day30'
     df = df[~df['id'].str.contains(fault1) & ~df['id'].str.contains(fault2)].reset_index(drop=True)
 
-    resave_25d_data(df, os.path.join(data_root, 'mmseg_train'))
-    split_train_val(os.path.join(data_root, 'mmseg_train'))
+    # resave_25d_data(df, os.path.join(data_root, 'mmseg_train'))
+    # split_train_val(os.path.join(data_root, 'mmseg_train'))
     check_data_mask(os.path.join(data_root, 'mmseg_train'))
 
